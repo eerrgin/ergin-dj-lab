@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#05070d" />
+  <title>Ergin DJ Lab — Procedural Web DJ Console</title>
+  <meta name="description" content="Ergin DJ Lab — an award-winning, fully browser-based DJ console. Two decks, 3-band EQ, filters, delay & reverb, all synthesised live with the Web Audio API. 100% copyright-free." />
+  <meta name="author" content="Ergin Kaplan" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ergin DJ Lab" />
+  <meta property="og:description" content="A high-end web DJ console with 100% procedurally generated audio. Designed & Created by Ergin Kaplan." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%2300e5ff'/><circle cx='50' cy='50' r='14' fill='%2305070d'/></svg>" />
+</head>
+<body>
+  <!-- animated background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--b" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ============================ HEADER ============================ -->
+  <header class="topbar glass">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <span class="brand-ring"></span>
+        <span class="brand-dot"></span>
+      </div>
+      <div class="brand-text">
+        <h1>ERGIN<span class="accent"> DJ LAB</span></h1>
+        <p class="brand-sub">Procedural Web Audio Console</p>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="pill" id="engineState" data-state="idle">
+        <span class="pill-dot"></span><span id="engineText">Audio Engine Idle</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="credit-chip" title="Designer & Creator">
+        <span class="credit-avatar" aria-hidden="true">EK</span>
+        <span class="credit-copy">
+          <strong>Designed &amp; Created by</strong>
+          <em>Ergin Kaplan</em>
+        </span>
+      </div>
+      <button class="btn btn-ghost" id="openAbout" type="button">About</button>
+      <button class="btn btn-primary" id="powerBtn" type="button">
+        <span class="power-ico" aria-hidden="true"></span> Power On
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================ PRESET BAR ============================ -->
+  <section class="presetbar glass" aria-label="Vibe presets">
+    <div class="preset-label">VIBES</div>
+    <div class="preset-group" id="presetGroup"><!-- filled by app.js --></div>
+    <div class="preset-meta">
+      <div class="metro">
+        <div class="metro-bar" id="metroA" aria-hidden="true"></div>
+        <span>DECK A</span>
+      </div>
+      <div class="metro">
+        <div class="metro-bar" id="metroB" aria-hidden="true"></div>
+        <span>DECK B</span>
+      </div>
+      <button class="btn btn-sync" id="syncBtn" type="button">SYNC BPM</button>
+    </div>
+  </section>
+
+  <!-- ============================ MAIN CONSOLE ============================ -->
+  <main class="console">
+
+    <!-- ---------- DECK A ---------- -->
+    <section class="deck glass deck--a" id="deckA" data-accent="#ff2d95" aria-label="Deck A">
+      <div class="deck-head">
+        <div class="deck-badge">A</div>
+        <div class="deck-info">
+          <select class="vibe-select" id="vibeA" aria-label="Deck A vibe"></select>
+          <div class="deck-tempo">
+            <span class="bpm-val" id="bpmValA">124</span>
+            <span class="bpm-unit">BPM</span>
+          </div>
+        </div>
+        <div class="deck-scope"><canvas class="scope-canvas" id="scopeA"></canvas></div>
+      </div>
+
+      <div class="deck-platter">
+        <div class="platter" id="platterA">
+          <div class="platter-groove"></div>
+          <div class="platter-groove"></div>
+          <div class="platter-groove"></div>
+          <div class="platter-label">
+            <span class="platter-title">ERGIN</span>
+            <span class="platter-sub">DJ LAB</span>
+          </div>
+          <div class="platter-strobe" id="strobeA"></div>
+        </div>
+        <div class="transport">
+          <button class="btn-play" id="playA" type="button" aria-label="Play Deck A">
+            <svg viewBox="0 0 24 24" class="ico-play"><path d="M8 5v14l11-7z"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="btn-cue" id="cueA" type="button" aria-label="Cue Deck A">CUE</button>
+        </div>
+        <div class="step-grid" id="gridA" aria-hidden="true"><!-- filled by app.js --></div>
+      </div>
+
+      <div class="deck-knobs">
+        <div class="knob-col">
+          <div class="knob" id="trimA"></div>
+          <div class="knob" id="gainA"></div>
+        </div>
+        <div class="knob-col eq-col">
+          <div class="knob" id="hiA"></div>
+          <div class="knob" id="midA"></div>
+          <div class="knob" id="lowA"></div>
+        </div>
+        <div class="knob-col fx-col">
+          <div class="knob" id="filterA"></div>
+          <div class="knob" id="echoA"></div>
+          <div class="knob" id="reverbA"></div>
+        </div>
+        <div class="fader-col">
+          <div class="fader" id="faderA"></div>
+          <div class="vu"><canvas class="vu-canvas" id="vuA"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CENTER MIXER ---------- -->
+    <section class="mixer glass" aria-label="Mixer and master section">
+      <div class="mixer-head">
+        <h2>MIXER</h2>
+        <span class="mixer-sub">Master Bus</span>
+      </div>
+
+      <div class="visualizer-wrap">
+        <canvas id="visualizer" class="visualizer"></canvas>
+        <div class="visualizer-tag">LIVE SPECTRUM</div>
+      </div>
+
+      <div class="xfader-block">
+        <div class="xfader-labels"><span>A</span><span>MASTER FADE</span><span>B</span></div>
+        <div class="xfader" id="xfader"></div>
+      </div>
+
+      <div class="master-block">
+        <div class="knob" id="masterVol"></div>
+        <div class="knob" id="delayTime"></div>
+        <div class="knob" id="delayFb"></div>
+        <div class="knob" id="reverbMix"></div>
+      </div>
+
+      <div class="master-meter">
+        <canvas class="vu-canvas vu-canvas--wide" id="vuMaster"></canvas>
+        <div class="master-meter-legend"><span>-∞</span><span>-12</span><span>0 dB</span></div>
+      </div>
+
+      <div class="mixer-footer">
+        <span class="badge-100">100% COPYRIGHT-FREE</span>
+        <button class="btn btn-ghost btn-sm" id="panicBtn" type="button">PANIC STOP</button>
+      </div>
+    </section>
+
+    <!-- ---------- DECK B ---------- -->
+    <section class="deck glass deck--b" id="deckB" data-accent="#00e5ff" aria-label="Deck B">
+      <div class="deck-head">
+        <div class="deck-badge">B</div>
+        <div class="deck-info">
+          <select class="vibe-select" id="vibeB" aria-label="Deck B vibe"></select>
+          <div class="deck-tempo">
+            <span class="bpm-val" id="bpmValB">120</span>
+            <span class="bpm-unit">BPM</span>
+          </div>
+        </div>
+        <div class="deck-scope"><canvas class="scope-canvas" id="scopeB"></canvas></div>
+      </div>
+
+      <div class="deck-platter">
+        <div class="platter" id="platterB">
+          <div class="platter-groove"></div>
+          <div class="platter-groove"></div>
+          <div class="platter-groove"></div>
+          <div class="platter-label">
+            <span class="platter-title">ERGIN</span>
+            <span class="platter-sub">DJ LAB</span>
+          </div>
+          <div class="platter-strobe" id="strobeB"></div>
+        </div>
+        <div class="transport">
+          <button class="btn-play" id="playB" type="button" aria-label="Play Deck B">
+            <svg viewBox="0 0 24 24" class="ico-play"><path d="M8 5v14l11-7z"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="btn-cue" id="cueB" type="button" aria-label="Cue Deck B">CUE</button>
+        </div>
+        <div class="step-grid" id="gridB" aria-hidden="true"></div>
+      </div>
+
+      <div class="deck-knobs">
+        <div class="knob-col">
+          <div class="knob" id="trimB"></div>
+          <div class="knob" id="gainB"></div>
+        </div>
+        <div class="knob-col eq-col">
+          <div class="knob" id="hiB"></div>
+          <div class="knob" id="midB"></div>
+          <div class="knob" id="lowB"></div>
+        </div>
+        <div class="knob-col fx-col">
+          <div class="knob" id="filterB"></div>
+          <div class="knob" id="echoB"></div>
+          <div class="knob" id="reverbB"></div>
+        </div>
+        <div class="fader-col">
+          <div class="fader" id="faderB"></div>
+          <div class="vu"><canvas class="vu-canvas" id="vuB"></canvas></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="footer glass">
+    <div class="footer-left">
+      <span class="footer-logo">ERGIN DJ LAB</span>
+      <p class="footer-disclaimer">
+        All audio is procedurally generated in your browser using the Web Audio API.
+        No copyrighted material or user uploads are used. 100% Copyright-Free.
+      </p>
+    </div>
+    <div class="footer-right">
+      <div class="footer-credit">
+        <span class="footer-kicker">Designed &amp; Created by</span>
+        <span class="footer-name">Ergin Kaplan</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="openDisclaimer" type="button">Disclaimer</button>
+    </div>
+  </footer>
+
+  <!-- ============================ MODALS ============================ -->
+  <div class="modal-backdrop" id="aboutModal" hidden>
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <button class="modal-close" data-close type="button" aria-label="Close">&times;</button>
+      <div class="about-hero">
+        <div class="brand-mark brand-mark--lg" aria-hidden="true"><span class="brand-ring"></span><span class="brand-dot"></span></div>
+        <h3 id="aboutTitle">Ergin DJ Lab</h3>
+        <p class="about-tag">A high-end procedural DJ console that runs entirely in your browser.</p>
+      </div>
+      <div class="about-body">
+        <div class="about-credit-card">
+          <span class="footer-kicker">Designed &amp; Created by</span>
+          <strong>Ergin Kaplan</strong>
+        </div>
+        <ul class="about-list">
+          <li><b>Two decks</b> — independent Play/Pause, BPM and vibe presets.</li>
+          <li><b>Full mixer</b> — 3-band EQ (Low/Mid/High), trim, gain and equal-power crossfader.</li>
+          <li><b>Live FX</b> — Reverb, Delay and a performance Low-Pass / High-Pass filter per deck.</li>
+          <li><b>Real synthesis</b> — kicks, snares, hats, bass, chords and leads generated from oscillators.</li>
+          <li><b>Visuals</b> — spectrum analyser, oscilloscopes and VU meters reacting in real time.</li>
+        </ul>
+        <p class="about-note">
+          All audio is procedurally generated in your browser using the Web Audio API.
+          No copyrighted material or user uploads are used. 100% Copyright-Free.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="disclaimerModal" hidden>
+    <div class="modal glass modal--sm" role="dialog" aria-modal="true" aria-labelledby="discTitle">
+      <button class="modal-close" data-close type="button" aria-label="Close">&times;</button>
+      <h3 id="discTitle">Disclaimer &amp; Copyright</h3>
+      <p class="disc-body">
+        All audio is procedurally generated in your browser using the Web Audio API.
+        No copyrighted material or user uploads are used. 100% Copyright-Free.
+      </p>
+      <p class="disc-sub">
+        This application is strictly for personal entertainment. It does not load, stream
+        or accept any third-party audio content. Every sound is synthesised live on your device.
+      </p>
+      <p class="disc-sign">Designed &amp; Created by Ergin Kaplan.</p>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <script src="js/patterns.js"></script>
+  <script src="js/audio-engine.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
